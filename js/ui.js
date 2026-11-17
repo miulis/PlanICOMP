@@ -8,6 +8,7 @@ import { materias, estructuraCurricular, SELECTIVAS } from './data.js';
 import {
   obtenerEstado,
   aprobar,
+  regularizar,
   desaprobar,
   getNombreSelectiva,
   setNombreSelectiva,
@@ -95,7 +96,7 @@ function construirTooltipFaltantes(materia) {
 
   const titulo = document.createElement('p');
   titulo.className   = 'subject-card__tooltip-titulo';
-  titulo.textContent  = 'Te falta aprobar:';
+  titulo.textContent  = 'Te falta regularizar o aprobar:';
   tooltip.appendChild(titulo);
 
   const lista = document.createElement('ul');
@@ -127,6 +128,7 @@ function construirCard(materia) {
   card.setAttribute('aria-label', materia.nombre);
 
   if (estado === 'approved')  card.setAttribute('aria-pressed', 'true');
+  if (estado === 'regular')   card.setAttribute('aria-pressed', 'mixed');
   if (estado === 'available') card.setAttribute('aria-pressed', 'false');
   if (estado === 'locked')    card.setAttribute('aria-disabled', 'true');
 
@@ -139,6 +141,13 @@ function construirCard(materia) {
   const nombreEl = document.createElement('span');
   nombreEl.textContent = materia.nombre;
   card.appendChild(nombreEl);
+
+  if (estado === 'regular') {
+    const badge = document.createElement('span');
+    badge.className   = 'subject-card__badge';
+    badge.textContent = 'Regular';
+    card.appendChild(badge);
+  }
 
   if (SELECTIVAS.has(materia.id)) {
     card.appendChild(construirInputSelectiva(materia));
@@ -165,13 +174,18 @@ function construirCard(materia) {
 
   if (estado !== 'locked') {
     const togglear = () => {
+      // Ciclo: pendiente → regular → aprobada → pendiente
       if (estado === 'approved') {
         desaprobar(materia.id);
         mostrarToast(`${materia.nombre} → pendiente`, 'info');
-      } else {
+      } else if (estado === 'regular') {
         aprobar(materia.id);
         agregarPulseRing(card);
         mostrarToast(`${materia.nombre} aprobada`, 'success');
+      } else {
+        regularizar(materia.id);
+        agregarPulseRing(card);
+        mostrarToast(`${materia.nombre} regular · ya podés cursar sus correlativas`, 'info');
       }
       render();
       actualizarProgreso();
