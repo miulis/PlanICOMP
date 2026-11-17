@@ -29,6 +29,10 @@
   --card-approved-border:   rgba(232, 115, 154, 0.30);
   --card-approved-text:     white;
 
+  --card-regular-bg:        rgba(232, 115, 154, 0.16);
+  --card-regular-border:    rgba(232, 115, 154, 0.55);
+  --card-regular-text:      var(--color-text);
+
   --card-locked-bg:         rgba(255, 255, 255, 0.020);
   --card-locked-border:     rgba(255, 255, 255, 0.055);
   --card-locked-text:       rgba(244, 228, 238, 0.18);
